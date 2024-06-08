@@ -3,8 +3,8 @@ from Crypto.Cipher import AES
 from Crypto.Random import get_random_bytes
 
 # Generate random keys
-hash_key = get_random_bytes(16).hex()  # Hex encoded hash key
-aes_key = get_random_bytes(16)  # AES key
+hash_key = get_random_bytes(16).hex()   # Hex encoded hash key
+aes_key = get_random_bytes(16)          # AES key
 
 # Polynomial hash function
 def polynomial_hash(message: str, key: str, prime: int) -> int:
@@ -30,7 +30,7 @@ def decrypt_with_aes(ciphertext: bytes, key: bytes) -> str:
     iv = ciphertext[:16]
     encrypted_data = ciphertext[16:-16]
     cipher = AES.new(key, AES.MODE_GCM, nonce=iv)
-    return cipher.update(str(hash_value).encode())
+    return cipher
 
 # Generate MAC using GCM mode
 def generate_mac(message: str, hash_key: str, aes_key: bytes) -> bytes:
@@ -42,22 +42,9 @@ def verify_mac(message: str, received_mac: bytes, hash_key: str, aes_key: bytes)
     hash_value = polynomial_hash(message, hash_key, int(1e9 + 9))
     tag = received_mac[-16:]
     decrypted_mac = decrypt_with_aes(received_mac, aes_key)
+    decrypted_mac.update(str(hash_value).encode())
     try:
         decrypted_mac.verify(tag)
-        return True
-    except ValueError:
-        return False
-
-# Verify MAC using GCM mode
-def verify_mac(message: str, received_mac: bytes, hash_key: str, aes_key: bytes) -> bool:
-    hash_value = polynomial_hash(message, hash_key, int(1e9 + 9))
-    nonce = received_mac[:16]
-    ciphertext = received_mac[16:-16]
-    tag = received_mac[-16:]
-    cipher = AES.new(aes_key, AES.MODE_GCM, nonce=nonce)
-    cipher.update(str(hash_value).encode())
-    try:
-        cipher.verify(tag)
         return True
     except ValueError:
         return False
