@@ -68,7 +68,7 @@ def test_scenarios():
     aes_cipher = AESCipher(aes_key)
     mac_generator = MACGenerator(hash_function, aes_cipher)
     
-    message = 'buku:3'
+    message = '{"Name": "Michael Leon","ID_Invoice": "Invoice/234/8i","Issuer": "Toko Baju X","Buy_Date": "17/08/2100","Price": 200000}'
     
     # 1. Normal Condition
     print("\n=== Normal Condition ===")
@@ -79,7 +79,7 @@ def test_scenarios():
 
     # 2. Message Modified
     print("\n=== Message Modified ===")
-    modified_message = 'buku:4'
+    modified_message = '{"Name": "Michael Leon","ID_Invoice": "Invoice/234/8i","Issuer": "Toko Baju X","Buy_Date": "17/08/2100","Price": 300000}'
     is_valid = mac_generator.verify_mac(modified_message, mac)
     print('Is MAC valid with modified message?', is_valid)
 
